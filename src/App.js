@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { Alert, Button, Card, Container, Form } from 'react-bootstrap';
 
 function App() {
+  let bearerToken = localStorage.getItem('bearer_token') ?? null;
+  axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL;
+  axios.defaults.headers.common['Authorization'] = 'Bearer ' +  bearerToken;
+  axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +21,8 @@ function App() {
 
     axios.post('http://localhost:8000/api/auth/login', formData).then(function (response) {
       setErrorMessage("");
-
+      localStorage.setItem('token', response.data.access_token);
+      localStorage.setItem('userData', JSON.stringify(response.data.user_data));
     }).catch(function (error) {
       if (error.response.status == 401) {
         setErrorMessage('Email e/ou Senha Inválido');
